@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - ShopSphere</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, textarea, button {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .order-item {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .order-item p {
+            margin: 5px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .form-group input[type="file"] {
+            padding: 5px;
+        }
+        .delete-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>    
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <h2>Add Product</h2>
+    <form action="{{ url_for('add_product') }}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <input type="text" name="name" placeholder="Product Name" required><br>
+        </div>
+        <div class="form-group">
+            <textarea name="description" placeholder="Description" required></textarea><br>
+        </div>
+        <div class="form-group">
+            <input type="number" name="price" placeholder="Price" required><br>
+        </div>
+        <div class="form-group">
+            <input type="file" name="image" required><br>
+        </div>
+        <button type="submit">Add Product</button>
+    </form>
+
+    <h2>Orders</h2>
+    {% for order in orders %}
+    <div class="order-item">
+        <p><strong>Product:</strong> {{ order.product_name }}</p>
+        <p><strong>Customer:</strong> {{ order.customer_name }}</p>
+        <p><strong>Phone:</strong> {{ order.customer_phone }}</p>
+        <p><strong>Status:</strong> {{ order.status }}</p>
+
+        {% if order.status == 'Pending' %}
+            <form action="{{ url_for('update_order', order_id=order.id, status='Accepted') }}" method="post" style="display:inline;">
+                <button type="submit">Accept</button>
+            </form>
+            <form action="{{ url_for('update_order', order_id=order.id, status='Rejected') }}" method="post" style="display:inline;">
+                <button type="submit">Reject</button>
+            </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <h2>Manage Products</h2>
+    {% for product in products %}
+    <div class="order-item">
+        <p><strong>Product:</strong> {{ product[1] }}</p>
+        <p><strong>Description:</strong> {{ product[2] }}</p>
+        <p><strong>Price:</strong> birr {{ product[3] }}</p>
+        <img src="{{ url_for('static', filename=product[4]) }}" alt="Product Image" width="100"><br>
+        <!-- Delete Product Form -->
+        <form action="{{ url_for('delete_product', product_id=product[0]) }}" method="post" style="display:inline;">
+            <button type="submit" class="delete-btn">Delete Product</button>
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html>
