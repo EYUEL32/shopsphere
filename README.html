@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ShopSphere - Products</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive scaling -->
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 2.5rem;
+            color: #5a5a5a;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .logo-container img {
+            max-width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .products-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .product {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: calc(33.33% - 40px); /* 3 per row, minus spacing */
+            text-align: center;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .product:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .product img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .product h3 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .product p {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .product .price {
+            font-size: 1.25rem;
+            color: #e63946;
+            font-weight: bold;
+        }
+
+        .product form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .product input[type="text"] {
+            padding: 10px;
+            margin: 8px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .product button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .product button:hover {
+            background-color: #45a049;
+        }
+
+        .notification {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .notification.error {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            margin-top: 40px;
+        }
+
+        .footer a {
+            color: #f1f1f1;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 1rem;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* MEDIA QUERIES */
+        @media (max-width: 992px) {
+            .product {
+                width: calc(50% - 40px); /* 2 per row on tablets */
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .product {
+                width: 100%; /* full width for phones */
+                padding: 15px;
+            }
+
+            .product h3 {
+                font-size: 1.2rem;
+            }
+
+            .product p,
+            .product .price,
+            .product input,
+            .product button {
+                font-size: 0.95rem;
+            }
+
+            .footer {
+                font-size: 0.9rem;
+            }
+
+            .footer a {
+                display: block;
+                margin: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="ShopSphere Logo" class="logo">
+    </div>
+
+    <h1>Welcome to ShopSphere</h1>
+    <div class="container">
+
+        {% if message %}
+            <div class="notification {% if 'rejected' in message.lower() %}error{% endif %}">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        {% if order_status %}
+            <div class="notification">
+                Your order status is: <strong>{{ order_status }}</strong>
+            </div>
+        {% endif %}
+
+        <div class="products-container">
+            {% for product in products %}
+            <div class="product">
+                <h3>{{ product[1] }}</h3>
+                <p>{{ product[2] }}</p>
+                <p class="price">birr {{ product[3] }}</p>
+                <img src="{{ url_for('static', filename='uploads/' + product[4].split('/')[-1]) }}" alt="Product Image">
+                <form action="{{ url_for('order', product_id=product[0]) }}" method="post">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="text" name="phone" placeholder="Phone Number" required>
+                    <button type="submit">Order</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Contact us:</p>
+        <a href="tel:+251994167127">Phone: +251994167127</a>
+        <a href="mailto:support@shopsphere.com">Email: support@shopsphere.com</a>
+        <a href="https://t.me/ShopSphereBot" target="_blank">Telegram: @ShopSphereBot</a>
+    </div>
+</body>
+</html>
